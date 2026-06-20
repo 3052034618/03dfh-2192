@@ -65,3 +65,185 @@
   font-size: $font-size-md;
   color: $color-text-tertiary;
 }
+
+.recordGroup {
+  margin-bottom: $spacing-xl;
+}
+
+.recordGroupHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: $spacing-md;
+}
+
+.recordGroupIcon {
+  font-size: $font-size-lg;
+  margin-right: $spacing-sm;
+}
+
+.recordGroupTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  flex: 1;
+}
+
+.titlejoin {
+  color: $color-join;
+}
+
+.titlereschedule {
+  color: #e17055;
+}
+
+.titlebackup {
+  color: $color-backup;
+}
+
+.recordGroupCount {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: $radius-round;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.countjoin {
+  background: rgba(0, 184, 148, 0.12);
+}
+
+.countreschedule {
+  background: rgba(253, 203, 110, 0.2);
+}
+
+.countbackup {
+  background: rgba(134, 144, 156, 0.12);
+}
+
+.recordGroupCountText {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+}
+
+.countjoin .recordGroupCountText {
+  color: $color-join;
+}
+
+.countreschedule .recordGroupCountText {
+  color: #e17055;
+}
+
+.countbackup .recordGroupCountText {
+  color: $color-backup;
+}
+
+.recordList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.recordCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.recordTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+}
+
+.recordGameName {
+  font-size: $font-size-lg;
+  color: $color-text-primary;
+  font-weight: $font-weight-semibold;
+  @include text-ellipsis;
+  flex: 1;
+  margin-right: $spacing-sm;
+}
+
+.recordStatus {
+  padding: 6rpx 20rpx;
+  border-radius: $radius-round;
+  flex-shrink: 0;
+}
+
+.statusjoin {
+  background: rgba(0, 184, 148, 0.12);
+}
+
+.statusreschedule {
+  background: rgba(253, 203, 110, 0.2);
+}
+
+.statusbackup {
+  background: rgba(134, 144, 156, 0.12);
+}
+
+.recordStatusText {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  white-space: nowrap;
+}
+
+.statusjoin .recordStatusText {
+  color: $color-join;
+}
+
+.statusreschedule .recordStatusText {
+  color: #e17055;
+}
+
+.statusbackup .recordStatusText {
+  color: $color-backup;
+}
+
+.recordMeta {
+  padding: $spacing-md;
+  background: $color-bg-page;
+  border-radius: $radius-md;
+}
+
+.recordMetaItem {
+  display: flex;
+  align-items: center;
+  margin-bottom: $spacing-xs;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.recordMetaIcon {
+  font-size: $font-size-sm;
+  margin-right: 8rpx;
+  flex-shrink: 0;
+}
+
+.recordMetaText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  @include text-ellipsis;
+}
+
+.recordMessage {
+  margin-top: $spacing-sm;
+  padding-top: $spacing-sm;
+  border-top: 1rpx dashed $color-border;
+}
+
+.recordMessageLabel {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.recordMessageText {
+  font-size: $font-size-sm;
+  color: #e17055;
+  display: block;
+  margin-top: 4rpx;
+}

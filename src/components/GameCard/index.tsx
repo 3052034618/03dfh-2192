@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, Image } from '@tarojs/components';
+import { View, Text, Image, Textarea } from '@tarojs/components';
 import type { GameSession, ResponseType } from '@/types';
 import classnames from 'classnames';
 import styles from './index.module.scss';
 
 interface GameCardProps {
   game: GameSession;
-  onResponse?: (gameId: string, response: ResponseType) => void;
+  onResponse?: (gameId: string, response: ResponseType, message?: string) => void;
   showResponse?: boolean;
 }
 
@@ -19,11 +19,29 @@ const nameVisibilityMap: Record<string, string> = {
 const GameCard: React.FC<GameCardProps> = ({ game, onResponse, showResponse = true }) => {
   const needPlayers = game.maxPlayers - game.currentPlayers;
   const [isEditing, setIsEditing] = useState(false);
+  const [showRescheduleModal, setShowRescheduleModal] = useState(false);
+  const [rescheduleMsg, setRescheduleMsg] = useState(game.myResponseMessage || '');
 
-  const handleResponse = (response: ResponseType) => {
+  const handleResponse = (response: ResponseType, message = '') => {
     setIsEditing(false);
-    onResponse?.(game.id, response);
+    setShowRescheduleModal(false);
+    onResponse?.(game.id, response, message);
   };
+
+  const handleRescheduleClick = () => {
+    setRescheduleMsg(game.myResponseMessage || '');
+    setShowRescheduleModal(true);
+  };
+
+  const handleConfirmReschedule = () => {
+    handleResponse('reschedule', rescheduleMsg.trim());
+  };
+
+  const timeMatchLabel = {
+    match: '✓ 时间合适',
+    mismatch: '✗ 时间冲突',
+    unknown: '',
+  }[game.timeMatch || 'unknown'];
 
   return (
     <View className={styles.card}>
@@ -37,6 +55,18 @@ const GameCard: React.FC<GameCardProps> = ({ game, onResponse, showResponse = tr
           <Text className={styles.genreText}>{game.genre}</Text>
         </View>
       </View>
+
+      {timeMatchLabel && (
+        <View
+          className={classnames(
+            styles.timeMatch,
+            game.timeMatch === 'match' && styles.timeMatchOk,
+            game.timeMatch === 'mismatch' && styles.timeMatchBad
+          )}
+        >
+          <Text className={styles.timeMatchText}>{timeMatchLabel}</Text>
+        </View>
+      )}
 
       <View className={styles.cardBody}>
         <Text className={styles.gameName}>{game.gameName}</Text>
@@ -75,10 +105,10 @@ const GameCard: React.FC<GameCardProps> = ({ game, onResponse, showResponse = tr
                 {game.myResponse === 'reschedule' && '想换时间 ⏰'}
                 {game.myResponse === 'backup' && '已当备选 📋'}
               </Text>
-              <Text
-                className={styles.changeBtn}
-                onClick={() => setIsEditing(true)}
-              >
+              {game.myResponse === 'reschedule' && game.myResponseMessage && (
+                <Text className={styles.respondedMsg}>"{game.myResponseMessage}"</Text>
+              )}
+              <Text className={styles.changeBtn} onClick={() => setIsEditing(true)}>
                 修改
               </Text>
             </View>
@@ -92,7 +122,7 @@ const GameCard: React.FC<GameCardProps> = ({ game, onResponse, showResponse = tr
               </View>
               <View
                 className={classnames(styles.responseBtn, styles.rescheduleBtn)}
-                onClick={() => handleResponse('reschedule')}
+                onClick={handleRescheduleClick}
               >
                 <Text className={styles.rescheduleBtnText}>想玩但换时间</Text>
               </View>
@@ -104,6 +134,38 @@ const GameCard: React.FC<GameCardProps> = ({ game, onResponse, showResponse = tr
               </View>
             </View>
           )}
+        </View>
+      )}
+
+      {showRescheduleModal && (
+        <View className={styles.modalMask} onClick={() => setShowRescheduleModal(false)}>
+          <View className={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <Text className={styles.modalTitle}>想换个什么时间？</Text>
+            <Text className={styles.modalHint}>可留空，举个例子：周六下午有事，周日全天可以</Text>
+            <Textarea
+              className={styles.modalInput}
+              placeholder="简单说说你合适的时间，车头会看到～"
+              value={rescheduleMsg}
+              onInput={(e) => setRescheduleMsg(e.detail.value)}
+              maxlength={60}
+              autoHeight
+            />
+            <Text className={styles.modalCounter}>{rescheduleMsg.length}/60</Text>
+            <View className={styles.modalActions}>
+              <View
+                className={classnames(styles.modalBtn, styles.modalBtnCancel)}
+                onClick={() => setShowRescheduleModal(false)}
+              >
+                <Text className={styles.modalBtnCancelText}>取消</Text>
+              </View>
+              <View
+                className={classnames(styles.modalBtn, styles.modalBtnConfirm)}
+                onClick={handleConfirmReschedule}
+              >
+                <Text className={styles.modalBtnConfirmText}>确定提交</Text>
+              </View>
+            </View>
+          </View>
         </View>
       )}
     </View>

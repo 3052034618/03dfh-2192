@@ -37,7 +37,9 @@ export interface GameSession {
   nameVisibility: NameVisibility;
   description: string;
   myResponse?: ResponseType;
+  myResponseMessage?: string;
   isHost: boolean;
+  timeMatch?: 'match' | 'mismatch' | 'unknown';
 }
 
 export interface GameResponse {
@@ -53,4 +55,10 @@ export interface FeedbackItem {
   gameSessionId: string;
   gameSession: GameSession;
   responses: GameResponse[];
+}
+
+export interface GameResponseRecord {
+  responseType: ResponseType;
+  message: string;
+  timestamp: string;
 }

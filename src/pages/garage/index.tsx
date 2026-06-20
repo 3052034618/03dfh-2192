@@ -42,9 +42,9 @@ const GaragePage = () => {
             <GameCard
               key={game.id}
               game={game}
-              onResponse={(gameId, response) => {
-                console.info('[Garage] 响应车局:', gameId, response);
-                respondToGame(gameId, response);
+              onResponse={(gameId, response, message) => {
+                console.info('[Garage] 响应车局:', gameId, response, message);
+                respondToGame(gameId, response, message);
               }}
             />
           ))
