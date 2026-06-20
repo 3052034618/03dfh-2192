@@ -1,0 +1,252 @@
+@use '@/styles/variables.scss' as *;
+
+.card {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+  margin-bottom: $spacing-md;
+  transition: all $transition-base;
+
+  &:active {
+    box-shadow: $shadow-card-hover;
+  }
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: $spacing-md;
+}
+
+.avatar {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: $radius-round;
+  margin-right: $spacing-md;
+  flex-shrink: 0;
+}
+
+.hostInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.hostName {
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  font-weight: $font-weight-semibold;
+  display: block;
+  @include text-ellipsis;
+}
+
+.visibility {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  display: block;
+  margin-top: 4rpx;
+}
+
+.genreTag {
+  padding: 6rpx 20rpx;
+  border-radius: $radius-round;
+  flex-shrink: 0;
+  margin-left: $spacing-sm;
+}
+
+.genre情感 {
+  background: rgba(253, 121, 168, 0.12);
+}
+
+.genre机制 {
+  background: rgba(108, 92, 231, 0.12);
+}
+
+.genre欢乐 {
+  background: rgba(253, 203, 110, 0.2);
+}
+
+.genre硬核推理 {
+  background: rgba(0, 184, 148, 0.12);
+}
+
+.genre恐怖 {
+  background: rgba(255, 118, 117, 0.12);
+}
+
+.genre阵营 {
+  background: rgba(116, 185, 255, 0.12);
+}
+
+.genre沉浸 {
+  background: rgba(162, 155, 254, 0.12);
+}
+
+.genreText {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  white-space: nowrap;
+}
+
+.genre情感 .genreText {
+  color: #e84393;
+}
+
+.genre机制 .genreText {
+  color: #6c5ce7;
+}
+
+.genre欢乐 .genreText {
+  color: #e17055;
+}
+
+.genre硬核推理 .genreText {
+  color: #00b894;
+}
+
+.genre恐怖 .genreText {
+  color: #ff7675;
+}
+
+.genre阵营 .genreText {
+  color: #0984e3;
+}
+
+.genre沉浸 .genreText {
+  color: #6c5ce7;
+}
+
+.cardBody {
+  margin-bottom: $spacing-md;
+}
+
+.gameName {
+  font-size: $font-size-xl;
+  color: $color-text-primary;
+  font-weight: $font-weight-semibold;
+  display: block;
+  margin-bottom: $spacing-xs;
+}
+
+.description {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  display: block;
+  @include text-ellipsis-multi(2);
+}
+
+.cardMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-md $spacing-lg;
+  margin-bottom: $spacing-md;
+  padding: $spacing-md;
+  background: $color-bg-page;
+  border-radius: $radius-md;
+}
+
+.metaItem {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.metaIcon {
+  font-size: $font-size-sm;
+  margin-right: 8rpx;
+  flex-shrink: 0;
+}
+
+.metaText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  @include text-ellipsis;
+}
+
+.urgent {
+  color: $color-error;
+  font-weight: $font-weight-semibold;
+}
+
+.unconfirmed {
+  color: $color-warning;
+}
+
+.responseBar {
+  border-top: 1rpx solid $color-divider;
+  padding-top: $spacing-md;
+}
+
+.responded {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.respondedText {
+  font-size: $font-size-md;
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+}
+
+.changeBtn {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin-left: $spacing-md;
+  padding: 8rpx 16rpx;
+}
+
+.responseButtons {
+  display: flex;
+  gap: $spacing-sm;
+}
+
+.responseBtn {
+  flex: 1;
+  height: $button-height-sm;
+  border-radius: $radius-button;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all $transition-base;
+  min-width: 0;
+  cursor: pointer;
+
+  &:active {
+    opacity: 0.85;
+    transform: scale(0.96);
+  }
+}
+
+.joinBtn {
+  background: linear-gradient(135deg, $color-join 0%, #55efc4 100%);
+}
+
+.joinBtnText {
+  font-size: $font-size-sm;
+  color: $color-text-white;
+  font-weight: $font-weight-medium;
+  white-space: nowrap;
+}
+
+.rescheduleBtn {
+  background: linear-gradient(135deg, #f0932b 0%, $color-warning 100%);
+}
+
+.rescheduleBtnText {
+  font-size: $font-size-xs;
+  color: $color-text-white;
+  font-weight: $font-weight-medium;
+  white-space: nowrap;
+}
+
+.backupBtn {
+  background: $color-bg-hover;
+}
+
+.backupBtnText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  font-weight: $font-weight-medium;
+  white-space: nowrap;
+}

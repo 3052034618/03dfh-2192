@@ -1,0 +1,108 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  padding: $spacing-lg $page-padding;
+  padding-bottom: 120rpx;
+}
+
+.pageTitle {
+  font-size: $font-size-xxl;
+  color: $color-text-primary;
+  font-weight: $font-weight-bold;
+  margin-bottom: $spacing-xs;
+}
+
+.pageDesc {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin-bottom: $spacing-lg;
+  display: block;
+}
+
+.filterBar {
+  display: flex;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-lg;
+  overflow-x: auto;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+}
+
+.filterTag {
+  padding: 10rpx 24rpx;
+  border-radius: $radius-round;
+  background: $color-bg-card;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  flex-shrink: 0;
+  transition: all $transition-base;
+  cursor: pointer;
+  border: 2rpx solid transparent;
+
+  &:active {
+    opacity: 0.85;
+  }
+}
+
+.filterTagActive {
+  background: $color-tag-bg;
+  color: $color-tag-text;
+  border-color: $color-primary;
+}
+
+.gameList {
+  display: flex;
+  flex-direction: column;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 120rpx 0;
+}
+
+.emptyIcon {
+  font-size: 80rpx;
+  margin-bottom: $spacing-lg;
+}
+
+.emptyText {
+  font-size: $font-size-md;
+  color: $color-text-tertiary;
+  margin-bottom: $spacing-sm;
+}
+
+.emptyHint {
+  font-size: $font-size-sm;
+  color: $color-text-disabled;
+}
+
+.createBtn {
+  position: fixed;
+  right: $page-padding;
+  bottom: 160rpx;
+  width: 112rpx;
+  height: 112rpx;
+  border-radius: $radius-round;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8rpx 24rpx rgba(108, 92, 231, 0.4);
+  z-index: 100;
+  transition: all $transition-base;
+  cursor: pointer;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.95);
+  }
+}
+
+.createBtnText {
+  font-size: $font-size-xxl;
+  color: $color-text-white;
+  font-weight: $font-weight-bold;
+}

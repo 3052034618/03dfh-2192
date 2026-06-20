@@ -1,0 +1,35 @@
+@use '@/styles/variables.scss' as *;
+
+.tagGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+}
+
+.tag {
+  padding: 12rpx 28rpx;
+  border-radius: $radius-round;
+  background: $color-tag-bg;
+  transition: all $transition-base;
+  cursor: pointer;
+
+  &:active {
+    opacity: 0.85;
+    transform: scale(0.96);
+  }
+}
+
+.tagActive {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  box-shadow: 0 4rpx 12rpx rgba(108, 92, 231, 0.3);
+}
+
+.tagText {
+  font-size: $font-size-sm;
+  color: $color-tag-text;
+  white-space: nowrap;
+}
+
+.tagTextActive {
+  color: $color-text-white;
+}
