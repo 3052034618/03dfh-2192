@@ -78,3 +78,22 @@
   font-size: $font-size-sm;
   color: $color-text-disabled;
 }
+
+.bestMatchTip {
+  margin-bottom: $spacing-sm;
+  text-align: center;
+}
+
+.bestMatchText {
+  font-size: $font-size-sm;
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+  background: rgba(108, 92, 231, 0.12);
+  padding: 8rpx 24rpx;
+  border-radius: $radius-round;
+  display: inline-block;
+}
+
+.highlightCard {
+  @include card-highlight;
+}

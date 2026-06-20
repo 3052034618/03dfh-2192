@@ -247,3 +247,130 @@
   display: block;
   margin-top: 4rpx;
 }
+
+.pendingCard {
+  background: linear-gradient(135deg, #fff5ed 0%, #fff 100%);
+  border: 2rpx solid rgba(253, 203, 110, 0.4);
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-lg;
+  box-shadow: 0 8rpx 24rpx rgba(253, 203, 110, 0.12);
+}
+
+.pendingHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+}
+
+.pendingTitle {
+  font-size: $font-size-lg;
+  color: $color-text-primary;
+  font-weight: $font-weight-semibold;
+}
+
+.pendingCountBadge {
+  width: 48rpx;
+  height: 48rpx;
+  background: linear-gradient(135deg, #f0932b 0%, #fdcb6e 100%);
+  border-radius: $radius-round;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pendingCountText {
+  font-size: $font-size-sm;
+  color: #fff;
+  font-weight: $font-weight-bold;
+}
+
+.pendingList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.pendingItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-md;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: $radius-md;
+  cursor: pointer;
+  transition: all $transition-base;
+
+  &:active {
+    transform: scale(0.98);
+    background: rgba(255, 255, 255, 1);
+  }
+}
+
+.pendingItemLeft {
+  flex: 1;
+  min-width: 0;
+  margin-right: $spacing-sm;
+}
+
+.pendingGameName {
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  font-weight: $font-weight-semibold;
+  @include text-ellipsis;
+}
+
+.pendingGameMeta {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-top: 4rpx;
+}
+
+.pendingItemRight {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: $spacing-sm;
+}
+
+.pendingTag {
+  padding: 6rpx 16rpx;
+  border-radius: $radius-round;
+}
+
+.pendingTagUrgent {
+  background: rgba(255, 118, 117, 0.12);
+}
+
+.pendingTagConflict {
+  background: rgba(134, 144, 156, 0.12);
+}
+
+.pendingTagHigh {
+  background: rgba(108, 92, 231, 0.12);
+}
+
+.pendingTagText {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  white-space: nowrap;
+}
+
+.pendingTagUrgent .pendingTagText {
+  color: $color-error;
+}
+
+.pendingTagConflict .pendingTagText {
+  color: $color-backup;
+}
+
+.pendingTagHigh .pendingTagText {
+  color: $color-primary;
+}
+
+.pendingArrow {
+  font-size: $font-size-lg;
+  color: $color-text-tertiary;
+  font-weight: $font-weight-bold;
+}

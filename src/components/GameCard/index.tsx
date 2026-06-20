@@ -16,11 +16,19 @@ const nameVisibilityMap: Record<string, string> = {
   'host-only': '仅车头可见',
 };
 
+const scoreTier = (score: number): { label: string; stars: number; tier: 'high' | 'mid' | 'low' } => {
+  if (score >= 4) return { label: '超适配', stars: 3, tier: 'high' };
+  if (score >= 1) return { label: '还不错', stars: 2, tier: 'mid' };
+  if (score >= -1) return { label: '一般般', stars: 1, tier: 'mid' };
+  return { label: '不太合适', stars: 0, tier: 'low' };
+};
+
 const GameCard: React.FC<GameCardProps> = ({ game, onResponse, showResponse = true }) => {
   const needPlayers = game.maxPlayers - game.currentPlayers;
   const [isEditing, setIsEditing] = useState(false);
   const [showRescheduleModal, setShowRescheduleModal] = useState(false);
   const [rescheduleMsg, setRescheduleMsg] = useState(game.myResponseMessage || '');
+  const [showAnalysis, setShowAnalysis] = useState(false);
 
   const handleResponse = (response: ResponseType, message = '') => {
     setIsEditing(false);
@@ -43,6 +51,8 @@ const GameCard: React.FC<GameCardProps> = ({ game, onResponse, showResponse = tr
     unknown: '',
   }[game.timeMatch || 'unknown'];
 
+  const tier = scoreTier(game.matchScore);
+
   return (
     <View className={styles.card}>
       <View className={styles.cardHeader}>
@@ -56,15 +66,39 @@ const GameCard: React.FC<GameCardProps> = ({ game, onResponse, showResponse = tr
         </View>
       </View>
 
-      {timeMatchLabel && (
-        <View
-          className={classnames(
-            styles.timeMatch,
-            game.timeMatch === 'match' && styles.timeMatchOk,
-            game.timeMatch === 'mismatch' && styles.timeMatchBad
-          )}
-        >
-          <Text className={styles.timeMatchText}>{timeMatchLabel}</Text>
+      <View className={styles.matchHeader}>
+        <View className={classnames(styles.scoreBadge, styles[`score${tier.tier}`])}>
+          <Text className={styles.scoreText}>
+            {'★'.repeat(tier.stars)}
+            {'☆'.repeat(3 - tier.stars)}{' '}
+            {tier.label}
+          </Text>
+        </View>
+        {timeMatchLabel && (
+          <View
+            className={classnames(
+              styles.timeMatch,
+              game.timeMatch === 'match' && styles.timeMatchOk,
+              game.timeMatch === 'mismatch' && styles.timeMatchBad
+            )}
+          >
+            <Text className={styles.timeMatchText}>{timeMatchLabel}</Text>
+          </View>
+        )}
+        <View className={styles.analysisToggle} onClick={() => setShowAnalysis(!showAnalysis)}>
+          <Text className={styles.analysisToggleText}>{showAnalysis ? '收起详情' : '看匹配详情'}</Text>
+          <Text className={classnames(styles.chevron, showAnalysis && styles.chevronUp)}>›</Text>
+        </View>
+      </View>
+
+      {showAnalysis && (
+        <View className={styles.analysisPanel}>
+          {game.matchReasons.map((r, i) => (
+            <View key={i} className={classnames(styles.reason, styles[`reason${r.type}`])}>
+              <Text className={styles.reasonIcon}>{r.icon}</Text>
+              <Text className={styles.reasonText}>{r.text}</Text>
+            </View>
+          ))}
         </View>
       )}
 

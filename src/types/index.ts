@@ -21,6 +21,14 @@ export type ResponseType = 'join' | 'reschedule' | 'backup';
 
 export type NameVisibility = 'all' | 'friends' | 'host-only';
 
+export type MatchReasonType = 'good' | 'bad' | 'warn';
+
+export interface MatchReason {
+  type: MatchReasonType;
+  icon: string;
+  text: string;
+}
+
 export interface GameSession {
   id: string;
   hostId: string;
@@ -40,6 +48,8 @@ export interface GameSession {
   myResponseMessage?: string;
   isHost: boolean;
   timeMatch?: 'match' | 'mismatch' | 'unknown';
+  matchScore: number;
+  matchReasons: MatchReason[];
 }
 
 export interface GameResponse {

@@ -394,3 +394,130 @@
   color: $color-text-white;
   font-weight: $font-weight-semibold;
 }
+
+.matchHeader {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: $spacing-sm $spacing-md;
+  margin-bottom: $spacing-md;
+}
+
+.scoreBadge {
+  padding: 6rpx 20rpx;
+  border-radius: $radius-round;
+}
+
+.scorehigh {
+  background: rgba(0, 184, 148, 0.12);
+}
+
+.scoremid {
+  background: rgba(253, 203, 110, 0.2);
+}
+
+.scorelow {
+  background: rgba(255, 118, 117, 0.12);
+}
+
+.scoreText {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  white-space: nowrap;
+}
+
+.scorehigh .scoreText {
+  color: $color-join;
+}
+
+.scoremid .scoreText {
+  color: #e17055;
+}
+
+.scorelow .scoreText {
+  color: $color-error;
+}
+
+.analysisToggle {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  cursor: pointer;
+  padding: 0 $spacing-sm;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.7;
+  }
+}
+
+.analysisToggleText {
+  font-size: $font-size-xs;
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+}
+
+.chevron {
+  font-size: $font-size-lg;
+  color: $color-primary;
+  margin-left: 4rpx;
+  transition: transform $transition-base;
+  transform: rotate(90deg);
+  display: inline-block;
+}
+
+.chevronUp {
+  transform: rotate(-90deg);
+}
+
+.analysisPanel {
+  padding: $spacing-md;
+  background: $color-bg-page;
+  border-radius: $radius-md;
+  margin-bottom: $spacing-md;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
+.reason {
+  display: flex;
+  align-items: flex-start;
+  padding: 10rpx 16rpx;
+  border-radius: $radius-sm;
+}
+
+.reasongood {
+  background: rgba(0, 184, 148, 0.08);
+}
+
+.reasonbad {
+  background: rgba(255, 118, 117, 0.08);
+}
+
+.reasonwarn {
+  background: rgba(253, 203, 110, 0.12);
+}
+
+.reasonIcon {
+  font-size: $font-size-sm;
+  margin-right: $spacing-xs;
+  flex-shrink: 0;
+}
+
+.reasonText {
+  font-size: $font-size-sm;
+  flex: 1;
+}
+
+.reasongood .reasonText {
+  color: $color-join;
+}
+
+.reasonbad .reasonText {
+  color: $color-error;
+}
+
+.reasonwarn .reasonText {
+  color: #e17055;
+}

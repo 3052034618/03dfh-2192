@@ -7,6 +7,8 @@ import type {
   GameResponse,
   ResponseType,
   GameResponseRecord,
+  MatchReason,
+  GenreType,
 } from '@/types';
 import { mockGames } from '@/data/games';
 import { mockFeedback } from '@/data/feedback';
@@ -94,36 +96,104 @@ function checkTimeMatch(dateTime: string, selectedSlots: string[]): 'match' | 'm
   return selectedSlots.includes(slotId) ? 'match' : 'mismatch';
 }
 
+function detectDealBreaker(genre: GenreType, dealBreakers: string): { hit: boolean; label?: string } {
+  if (!dealBreakers) return { hit: false };
+  const db = dealBreakers.toLowerCase();
+  if (genre === '恐怖' && (db.includes('恐怖') || db.includes('不玩恐怖') || db.includes('怕恐怖'))) {
+    return { hit: true, label: '恐怖本' };
+  }
+  if (db.includes('不反串') || db.includes('不要反串') || db.includes('别反串')) {
+    return { hit: false };
+  }
+  if (db.includes('不玩') && db.includes(genre)) {
+    return { hit: true, label: genre + '本' };
+  }
+  return { hit: false };
+}
+
+function computeMatchInfo(
+  game: GameSession,
+  availability: UserAvailability
+): { score: number; reasons: MatchReason[] } {
+  const reasons: MatchReason[] = [];
+  let score = 0;
+
+  const timeMatch = checkTimeMatch(game.dateTime, availability.selectedSlots);
+  if (timeMatch === 'match') {
+    score += 3;
+    reasons.push({ type: 'good', icon: '✓', text: '时间正好落在你的空档' });
+  } else if (timeMatch === 'mismatch') {
+    score -= 1;
+    reasons.push({ type: 'bad', icon: '✗', text: '时间不在你的空档' });
+  }
+
+  const prefHit = availability.preferences.includes(game.genre);
+  if (prefHit) {
+    score += 2;
+    reasons.push({ type: 'good', icon: '🎯', text: `偏好命中「${game.genre}」` });
+  }
+
+  const dealBreaker = detectDealBreaker(game.genre, availability.dealBreakers);
+  if (dealBreaker.hit) {
+    score -= 5;
+    reasons.push({ type: 'bad', icon: '💥', text: `踩雷点：${dealBreaker.label}` });
+  }
+
+  if (!game.venueConfirmed) {
+    reasons.push({ type: 'warn', icon: '📌', text: '店铺还没定' });
+  } else {
+    reasons.push({ type: 'good', icon: '📍', text: `店铺已确认：${game.venueName}` });
+  }
+
+  const needPlayers = game.maxPlayers - game.currentPlayers;
+  if (needPlayers <= 2) {
+    score += 1;
+    reasons.push({ type: 'warn', icon: '🔥', text: `快要齐人了，还差${needPlayers}位` });
+  }
+
+  return { score, reasons };
+}
+
+function applyMatchInfo(games: GameSession[], availability: UserAvailability): GameSession[] {
+  return games.map((g) => {
+    const { score, reasons } = computeMatchInfo(g, availability);
+    const timeMatch = checkTimeMatch(g.dateTime, availability.selectedSlots);
+    return { ...g, matchScore: score, matchReasons: reasons, timeMatch };
+  });
+}
+
 function applyGameResponses(
   games: GameSession[],
   responses: Record<string, GameResponseRecord>,
   availability: UserAvailability
 ): GameSession[] {
-  return games.map((g) => {
-    const resp = responses[g.id];
-    const timeMatch = checkTimeMatch(g.dateTime, availability.selectedSlots);
-    return {
-      ...g,
-      myResponse: resp?.responseType,
-      myResponseMessage: resp?.message,
-      timeMatch,
-    };
-  });
+  return applyMatchInfo(
+    games.map((g) => {
+      const resp = responses[g.id];
+      return {
+        ...g,
+        myResponse: resp?.responseType,
+        myResponseMessage: resp?.message,
+      };
+    }),
+    availability
+  );
 }
 
 function buildFeedbacks(
   baseFeedbacks: FeedbackItem[],
   games: GameSession[],
-  responses: Record<string, GameResponseRecord>
+  responses: Record<string, GameResponseRecord>,
+  availability: UserAvailability
 ): FeedbackItem[] {
-  const hostedGameIds = new Set(
-    baseFeedbacks.filter((fb) => fb.gameSession.isHost).map((fb) => fb.gameSessionId)
-  );
+  const hostedFeedbackMap = new Map<string, FeedbackItem>();
+  baseFeedbacks
+    .filter((fb) => fb.gameSession.isHost)
+    .forEach((fb) => hostedFeedbackMap.set(fb.gameSessionId, fb));
 
-  const result = baseFeedbacks.map((fb) => {
+  const hostedResults: FeedbackItem[] = Array.from(hostedFeedbackMap.values()).map((fb) => {
     const myResp = responses[fb.gameSessionId];
     if (!myResp) return fb;
-
     const existingIdx = fb.responses.findIndex((r) => r.playerId === MY_ID);
     let newResponses: GameResponse[];
     if (existingIdx >= 0) {
@@ -148,13 +218,16 @@ function buildFeedbacks(
     return { ...fb, responses: newResponses };
   });
 
+  const joinedResults: FeedbackItem[] = [];
   Object.entries(responses).forEach(([gameId, record]) => {
-    if (hostedGameIds.has(gameId)) return;
-    const existingFbIdx = result.findIndex((fb) => fb.gameSessionId === gameId);
+    if (hostedFeedbackMap.has(gameId)) return;
     const game = games.find((g) => g.id === gameId);
-    if (!game) return;
+    if (!game || game.isHost) return;
 
-    const sessionData: GameSession = { ...game, isHost: false };
+    const sessionWithMatch: GameSession = (() => {
+      const { score, reasons } = computeMatchInfo(game, availability);
+      return { ...game, isHost: false, matchScore: score, matchReasons: reasons };
+    })();
 
     const myResponseEntry: GameResponse = {
       playerId: MY_ID,
@@ -162,37 +235,23 @@ function buildFeedbacks(
       playerAvatar: MY_AVATAR,
       responseType: record.responseType,
       message: record.message || '',
-      timestamp: '刚刚',
+      timestamp: record.timestamp || '刚刚',
     };
 
-    if (existingFbIdx >= 0) {
-      const existing = result[existingFbIdx];
-      const respIdx = existing.responses.findIndex((r) => r.playerId === MY_ID);
-      let newResponses: GameResponse[];
-      if (respIdx >= 0) {
-        newResponses = existing.responses.map((r, i) =>
-          i === respIdx ? myResponseEntry : r
-        );
-      } else {
-        newResponses = [...existing.responses, myResponseEntry];
-      }
-      result[existingFbIdx] = { ...existing, responses: newResponses };
-    } else {
-      result.push({
-        gameSessionId: gameId,
-        gameSession: sessionData,
-        responses: [myResponseEntry],
-      });
-    }
+    joinedResults.push({
+      gameSessionId: gameId,
+      gameSession: sessionWithMatch,
+      responses: [myResponseEntry],
+    });
   });
 
-  return result;
+  return [...hostedResults, ...joinedResults];
 }
 
 const initialGameResponses = loadGameResponses();
 const initialAvailability = loadAvailability();
 const initialGames = applyGameResponses(mockGames, initialGameResponses, initialAvailability);
-const initialFeedbacks = buildFeedbacks(mockFeedback, mockGames, initialGameResponses);
+const initialFeedbacks = buildFeedbacks(mockFeedback, mockGames, initialGameResponses, initialAvailability);
 
 interface AppState {
   availability: UserAvailability;
@@ -216,7 +275,8 @@ export const useAppStore = create<AppState>((set, get) => ({
     const newAvailability = { ...state.availability, ...data };
     saveAvailability(newAvailability);
     const newGames = applyGameResponses(mockGames, state.gameResponses, newAvailability);
-    set({ availability: newAvailability, games: newGames });
+    const newFeedbacks = buildFeedbacks(mockFeedback, mockGames, state.gameResponses, newAvailability);
+    set({ availability: newAvailability, games: newGames, feedbacks: newFeedbacks });
   },
 
   toggleSlot: (slotId) => {
@@ -228,7 +288,8 @@ export const useAppStore = create<AppState>((set, get) => ({
     const newAvailability = { ...state.availability, selectedSlots: newSlots };
     saveAvailability(newAvailability);
     const newGames = applyGameResponses(mockGames, state.gameResponses, newAvailability);
-    set({ availability: newAvailability, games: newGames });
+    const newFeedbacks = buildFeedbacks(mockFeedback, mockGames, state.gameResponses, newAvailability);
+    set({ availability: newAvailability, games: newGames, feedbacks: newFeedbacks });
   },
 
   togglePreference: (genre) => {
@@ -239,7 +300,9 @@ export const useAppStore = create<AppState>((set, get) => ({
       : [...prefs, genre as any];
     const newAvailability = { ...state.availability, preferences: newPrefs };
     saveAvailability(newAvailability);
-    set({ availability: newAvailability });
+    const newGames = applyGameResponses(mockGames, state.gameResponses, newAvailability);
+    const newFeedbacks = buildFeedbacks(mockFeedback, mockGames, state.gameResponses, newAvailability);
+    set({ availability: newAvailability, games: newGames, feedbacks: newFeedbacks });
   },
 
   respondToGame: (gameId, response, message = '') => {
@@ -253,7 +316,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     saveGameResponses(newGameResponses);
 
     const newGames = applyGameResponses(mockGames, newGameResponses, state.availability);
-    const newFeedbacks = buildFeedbacks(mockFeedback, mockGames, newGameResponses);
+    const newFeedbacks = buildFeedbacks(mockFeedback, mockGames, newGameResponses, state.availability);
 
     set({
       games: newGames,

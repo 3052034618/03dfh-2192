@@ -1,5 +1,6 @@
-import React, { useState, useMemo } from 'react';
-import { View, Text } from '@tarojs/components';
+import React, { useState, useMemo, useEffect } from 'react';
+import { View, Text, useRouter, useDidShow } from '@tarojs/taro';
+import Taro from '@tarojs/taro';
 import GameCard from '@/components/GameCard';
 import { useAppStore } from '@/store/useAppStore';
 import { genreOptions } from '@/data/availability';
@@ -8,16 +9,68 @@ import styles from './index.module.scss';
 
 const GaragePage = () => {
   const { games, respondToGame } = useAppStore();
-  const [activeFilter, setActiveFilter] = useState('全部');
+  const [activeFilter, setActiveFilter] = useState('适合我优先');
+  const router = useRouter();
+  const [highlightId, setHighlightId] = useState<string | null>(null);
+
+  const scrollToGame = (gameId: string) => {
+    setHighlightId(gameId);
+    try {
+      const query = Taro.createSelectorQuery();
+      query.select(`#game-${gameId}`).boundingClientRect();
+      query.selectViewport().scrollOffset();
+      query.exec((res) => {
+        if (res && res[0] && res[1]) {
+          Taro.pageScrollTo({
+            scrollTop: (res[0].top ?? 0) + (res[1].scrollTop ?? 0) - 100,
+            duration: 300,
+          });
+        }
+      });
+    } catch (e) {
+      console.warn('[Garage] scrollToGame fallback:', e);
+    }
+  };
+
+  useEffect(() => {
+    const initialId = router.params?.highlightId;
+    if (initialId) {
+      scrollToGame(initialId);
+    }
+    Taro.eventCenter.on('scrollToGame', scrollToGame);
+    return () => {
+      Taro.eventCenter.off('scrollToGame', scrollToGame);
+    };
+  }, [router.params?.highlightId]);
+
+  useDidShow(() => {
+    if (highlightId) {
+      setTimeout(() => {
+        setHighlightId(null);
+      }, 2500);
+    }
+  });
 
   const filteredGames = useMemo(() => {
-    if (activeFilter === '全部') return games;
-    if (activeFilter === '待响应') return games.filter((g) => !g.myResponse);
-    if (activeFilter === '已上车') return games.filter((g) => g.myResponse === 'join');
-    return games.filter((g) => g.genre === activeFilter);
+    let list = [...games];
+    if (activeFilter === '适合我优先') {
+      list.sort((a, b) => b.matchScore - a.matchScore);
+    } else if (activeFilter === '全部') {
+      // 保持原序
+    } else if (activeFilter === '待响应') {
+      list = list.filter((g) => !g.myResponse);
+    } else if (activeFilter === '已上车') {
+      list = list.filter((g) => g.myResponse === 'join');
+    } else if (activeFilter === '快缺人') {
+      list = list.filter((g) => g.maxPlayers - g.currentPlayers <= 2);
+      list.sort((a, b) => a.maxPlayers - a.currentPlayers - (b.maxPlayers - b.currentPlayers));
+    } else {
+      list = list.filter((g) => g.genre === activeFilter);
+    }
+    return list;
   }, [games, activeFilter]);
 
-  const filterTags = ['全部', '待响应', '已上车', ...genreOptions];
+  const filterTags = ['适合我优先', '全部', '待响应', '已上车', '快缺人', ...genreOptions];
 
   return (
     <View className={styles.page}>
@@ -38,15 +91,25 @@ const GaragePage = () => {
 
       <View className={styles.gameList}>
         {filteredGames.length > 0 ? (
-          filteredGames.map((game) => (
-            <GameCard
+          filteredGames.map((game, idx) => (
+            <View
               key={game.id}
-              game={game}
-              onResponse={(gameId, response, message) => {
-                console.info('[Garage] 响应车局:', gameId, response, message);
-                respondToGame(gameId, response, message);
-              }}
-            />
+              id={`game-${game.id}`}
+              className={classnames(highlightId === game.id && styles.highlightCard)}
+            >
+              {activeFilter === '适合我优先' && idx === 0 && (
+                <View className={styles.bestMatchTip}>
+                  <Text className={styles.bestMatchText}>⭐ 最推荐的车局</Text>
+                </View>
+              )}
+              <GameCard
+                game={game}
+                onResponse={(gameId, response, message) => {
+                  console.info('[Garage] 响应车局:', gameId, response, message);
+                  respondToGame(gameId, response, message);
+                }}
+              />
+            </View>
           ))
         ) : (
           <View className={styles.emptyState}>

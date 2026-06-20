@@ -128,3 +128,23 @@ $transition-slow: 0.35s ease;
     border: none;
   }
 }
+
+// 卡片高亮闪烁效果（用于从其他页跳转定位时的视觉提示）
+@mixin card-highlight {
+  animation: card-highlight-pulse 2.2s ease-out forwards;
+}
+
+@keyframes card-highlight-pulse {
+  0% {
+    border-radius: $radius-lg;
+    box-shadow: 0 0 0 6rpx rgba(253, 203, 110, 0.5), 0 8rpx 24rpx rgba(253, 203, 110, 0.25);
+  }
+  60% {
+    border-radius: $radius-lg;
+    box-shadow: 0 0 0 2rpx rgba(253, 203, 110, 0.3);
+  }
+  100% {
+    border-radius: $radius-lg;
+    box-shadow: none;
+  }
+}
