@@ -2,8 +2,7 @@ export default defineAppConfig({
   pages: [
     'pages/availability/index',
     'pages/garage/index',
-    'pages/feedback/index',
-    'pages/create/index'
+    'pages/feedback/index'
   ],
   window: {
     backgroundTextStyle: 'light',

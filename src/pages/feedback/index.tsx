@@ -6,18 +6,16 @@ import classnames from 'classnames';
 import styles from './index.module.scss';
 
 const FeedbackPage = () => {
-  const { games, feedbacks } = useAppStore();
+  const { feedbacks } = useAppStore();
   const [activeTab, setActiveTab] = useState<'hosted' | 'joined'>('hosted');
 
-  const myResponses = useMemo(() => {
-    return games.filter((g) => g.myResponse);
-  }, [games]);
+  const hostedFeedbacks = useMemo(() => {
+    return feedbacks.filter((fb) => fb.gameSession.isHost);
+  }, [feedbacks]);
 
-  const statusLabel: Record<string, string> = {
-    join: '已上车',
-    reschedule: '想换时间',
-    backup: '备选',
-  };
+  const joinedFeedbacks = useMemo(() => {
+    return feedbacks.filter((fb) => !fb.gameSession.isHost);
+  }, [feedbacks]);
 
   return (
     <View className={styles.page}>
@@ -41,8 +39,8 @@ const FeedbackPage = () => {
 
       {activeTab === 'hosted' && (
         <View>
-          {feedbacks.length > 0 ? (
-            feedbacks.map((fb) => <FeedbackCard key={fb.gameSessionId} feedback={fb} />)
+          {hostedFeedbacks.length > 0 ? (
+            hostedFeedbacks.map((fb) => <FeedbackCard key={fb.gameSessionId} feedback={fb} />)
           ) : (
             <View className={styles.emptyState}>
               <Text className={styles.emptyIcon}>📋</Text>
@@ -54,27 +52,8 @@ const FeedbackPage = () => {
 
       {activeTab === 'joined' && (
         <View>
-          {myResponses.length > 0 ? (
-            myResponses.map((game) => (
-              <View className={styles.myResponseCard} key={game.id}>
-                <View className={styles.responseInfo}>
-                  <Text className={styles.responseGameName}>{game.gameName}</Text>
-                  <Text className={styles.responseMeta}>
-                    {game.hostName}发起 · {game.dateTime}
-                  </Text>
-                </View>
-                <View
-                  className={classnames(
-                    styles.responseStatus,
-                    game.myResponse === 'join' && styles.statusJoin,
-                    game.myResponse === 'reschedule' && styles.statusReschedule,
-                    game.myResponse === 'backup' && styles.statusBackup
-                  )}
-                >
-                  <Text className={styles.statusText}>{statusLabel[game.myResponse!]}</Text>
-                </View>
-              </View>
-            ))
+          {joinedFeedbacks.length > 0 ? (
+            joinedFeedbacks.map((fb) => <FeedbackCard key={fb.gameSessionId} feedback={fb} />)
           ) : (
             <View className={styles.emptyState}>
               <Text className={styles.emptyIcon}>🤷</Text>

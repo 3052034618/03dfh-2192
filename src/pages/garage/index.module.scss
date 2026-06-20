@@ -78,31 +78,3 @@
   font-size: $font-size-sm;
   color: $color-text-disabled;
 }
-
-.createBtn {
-  position: fixed;
-  right: $page-padding;
-  bottom: 160rpx;
-  width: 112rpx;
-  height: 112rpx;
-  border-radius: $radius-round;
-  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 8rpx 24rpx rgba(108, 92, 231, 0.4);
-  z-index: 100;
-  transition: all $transition-base;
-  cursor: pointer;
-
-  &:active {
-    opacity: 0.9;
-    transform: scale(0.95);
-  }
-}
-
-.createBtnText {
-  font-size: $font-size-xxl;
-  color: $color-text-white;
-  font-weight: $font-weight-bold;
-}

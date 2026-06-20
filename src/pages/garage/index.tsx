@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react';
 import { View, Text } from '@tarojs/components';
-import Taro from '@tarojs/taro';
 import GameCard from '@/components/GameCard';
 import { useAppStore } from '@/store/useAppStore';
 import { genreOptions } from '@/data/availability';
@@ -19,10 +18,6 @@ const GaragePage = () => {
   }, [games, activeFilter]);
 
   const filterTags = ['全部', '待响应', '已上车', ...genreOptions];
-
-  const handleCreate = () => {
-    Taro.navigateTo({ url: '/pages/create/index' });
-  };
 
   return (
     <View className={styles.page}>
@@ -57,13 +52,9 @@ const GaragePage = () => {
           <View className={styles.emptyState}>
             <Text className={styles.emptyIcon}>🎮</Text>
             <Text className={styles.emptyText}>暂无车局</Text>
-            <Text className={styles.emptyHint}>等朋友发起，或者自己组一局？</Text>
+            <Text className={styles.emptyHint}>等朋友发起吧～</Text>
           </View>
         )}
-      </View>
-
-      <View className={styles.createBtn} onClick={handleCreate}>
-        <Text className={styles.createBtnText}>+</Text>
       </View>
     </View>
   );
