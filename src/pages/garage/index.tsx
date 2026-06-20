@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { View, Text, useRouter, useDidShow } from '@tarojs/taro';
-import Taro from '@tarojs/taro';
+import { View, Text } from '@tarojs/components';
+import Taro, { useDidShow } from '@tarojs/taro';
 import GameCard from '@/components/GameCard';
 import { useAppStore } from '@/store/useAppStore';
 import { genreOptions } from '@/data/availability';
@@ -10,44 +10,42 @@ import styles from './index.module.scss';
 const GaragePage = () => {
   const { games, respondToGame } = useAppStore();
   const [activeFilter, setActiveFilter] = useState('适合我优先');
-  const router = useRouter();
   const [highlightId, setHighlightId] = useState<string | null>(null);
 
   const scrollToGame = (gameId: string) => {
     setHighlightId(gameId);
-    try {
-      const query = Taro.createSelectorQuery();
-      query.select(`#game-${gameId}`).boundingClientRect();
-      query.selectViewport().scrollOffset();
-      query.exec((res) => {
-        if (res && res[0] && res[1]) {
-          Taro.pageScrollTo({
-            scrollTop: (res[0].top ?? 0) + (res[1].scrollTop ?? 0) - 100,
-            duration: 300,
-          });
-        }
-      });
-    } catch (e) {
-      console.warn('[Garage] scrollToGame fallback:', e);
-    }
+    setTimeout(() => {
+      try {
+        const query = Taro.createSelectorQuery();
+        query.select(`#game-${gameId}`).boundingClientRect();
+        query.selectViewport().scrollOffset();
+        query.exec((res) => {
+          if (res && res[0] && res[1]) {
+            Taro.pageScrollTo({
+              scrollTop: (res[0].top ?? 0) + (res[1].scrollTop ?? 0) - 100,
+              duration: 300,
+            });
+          }
+        });
+      } catch (e) {
+        console.warn('[Garage] scrollToGame failed:', e);
+      }
+    }, 400);
   };
 
   useEffect(() => {
-    const initialId = router.params?.highlightId;
-    if (initialId) {
-      scrollToGame(initialId);
-    }
     Taro.eventCenter.on('scrollToGame', scrollToGame);
     return () => {
       Taro.eventCenter.off('scrollToGame', scrollToGame);
     };
-  }, [router.params?.highlightId]);
+  }, []);
 
   useDidShow(() => {
     if (highlightId) {
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         setHighlightId(null);
       }, 2500);
+      return () => clearTimeout(timer);
     }
   });
 
@@ -56,7 +54,6 @@ const GaragePage = () => {
     if (activeFilter === '适合我优先') {
       list.sort((a, b) => b.matchScore - a.matchScore);
     } else if (activeFilter === '全部') {
-      // 保持原序
     } else if (activeFilter === '待响应') {
       list = list.filter((g) => !g.myResponse);
     } else if (activeFilter === '已上车') {
@@ -105,7 +102,7 @@ const GaragePage = () => {
               <GameCard
                 game={game}
                 onResponse={(gameId, response, message) => {
-                  console.info('[Garage] 响应车局:', gameId, response, message);
+                  console.info('[Garage] respond:', gameId, response, message);
                   respondToGame(gameId, response, message);
                 }}
               />

@@ -89,7 +89,9 @@ const FeedbackPage = () => {
     Taro.switchTab({
       url: '/pages/garage/index',
       success: () => {
-        Taro.eventCenter.trigger('scrollToGame', gameId);
+        setTimeout(() => {
+          Taro.eventCenter.trigger('scrollToGame', gameId);
+        }, 300);
       },
     });
   };
@@ -115,10 +117,10 @@ const FeedbackPage = () => {
                 onClick={() => handleJumpToGame(item.game.id)}
               >
                 <View className={styles.pendingItemLeft}>
-                  <View className={styles.pendingGameName}>{item.game.gameName}</View>
-                  <View className={styles.pendingGameMeta}>
+                  <Text className={styles.pendingGameName}>{item.game.gameName}</Text>
+                  <Text className={styles.pendingGameMeta}>
                     {item.game.hostName} · {item.game.dateTime}
-                  </View>
+                  </Text>
                 </View>
                 <View className={styles.pendingItemRight}>
                   <View

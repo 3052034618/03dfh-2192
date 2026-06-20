@@ -26,6 +26,12 @@ const DEFAULT_AVAILABILITY: UserAvailability = {
   dealBreakers: '不玩恐怖本、不反串',
 };
 
+const DEFAULT_GAME_RESPONSES: Record<string, GameResponseRecord> = {
+  g2: { responseType: 'join', message: '', timestamp: '3天前' },
+  g5: { responseType: 'backup', message: '', timestamp: '2天前' },
+  g7: { responseType: 'reschedule', message: '周日全天可以', timestamp: '1天前' },
+};
+
 const dayKeyMap: Record<string, string> = {
   周一: 'mon',
   周二: 'tue',
@@ -48,7 +54,7 @@ function loadAvailability(): UserAvailability {
       };
     }
   } catch (e) {
-    console.error('[Store] 读取空档缓存失败:', e);
+    console.error('[Store] read availability cache failed:', e);
   }
   return DEFAULT_AVAILABILITY;
 }
@@ -57,25 +63,31 @@ function saveAvailability(data: UserAvailability) {
   try {
     Taro.setStorageSync(STORAGE_KEY_AVAILABILITY, JSON.stringify(data));
   } catch (e) {
-    console.error('[Store] 保存空档缓存失败:', e);
+    console.error('[Store] save availability cache failed:', e);
   }
 }
 
 function loadGameResponses(): Record<string, GameResponseRecord> {
+  const merged = { ...DEFAULT_GAME_RESPONSES };
   try {
     const raw = Taro.getStorageSync(STORAGE_KEY_RESPONSES);
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      const stored = JSON.parse(raw);
+      Object.entries(stored).forEach(([k, v]) => {
+        merged[k] = v as GameResponseRecord;
+      });
+    }
   } catch (e) {
-    console.error('[Store] 读取响应缓存失败:', e);
+    console.error('[Store] read responses cache failed:', e);
   }
-  return {};
+  return merged;
 }
 
 function saveGameResponses(data: Record<string, GameResponseRecord>) {
   try {
     Taro.setStorageSync(STORAGE_KEY_RESPONSES, JSON.stringify(data));
   } catch (e) {
-    console.error('[Store] 保存响应缓存失败:', e);
+    console.error('[Store] save responses cache failed:', e);
   }
 }
 
@@ -224,10 +236,12 @@ function buildFeedbacks(
     const game = games.find((g) => g.id === gameId);
     if (!game || game.isHost) return;
 
-    const sessionWithMatch: GameSession = (() => {
-      const { score, reasons } = computeMatchInfo(game, availability);
-      return { ...game, isHost: false, matchScore: score, matchReasons: reasons };
-    })();
+    const { score, reasons } = computeMatchInfo(game, availability);
+    const sessionWithMatch: GameSession = {
+      ...game,
+      matchScore: score,
+      matchReasons: reasons,
+    };
 
     const myResponseEntry: GameResponse = {
       playerId: MY_ID,

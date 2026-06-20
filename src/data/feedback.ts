@@ -2,9 +2,9 @@ import type { FeedbackItem } from '@/types';
 
 export const mockFeedback: FeedbackItem[] = [
   {
-    gameSessionId: 'g1',
+    gameSessionId: 'h1',
     gameSession: {
-      id: 'g1',
+      id: 'h1',
       hostId: 'me',
       hostName: '我',
       hostAvatar: 'https://picsum.photos/id/64/200/200',
@@ -19,6 +19,9 @@ export const mockFeedback: FeedbackItem[] = [
       nameVisibility: 'all',
       description: '经典情感本，角色分配公平',
       isHost: true,
+      matchScore: 0,
+      matchReasons: [],
+      timeMatch: 'unknown',
     },
     responses: [
       {
@@ -56,9 +59,9 @@ export const mockFeedback: FeedbackItem[] = [
     ],
   },
   {
-    gameSessionId: 'g2',
+    gameSessionId: 'h2',
     gameSession: {
-      id: 'g2',
+      id: 'h2',
       hostId: 'me',
       hostName: '我',
       hostAvatar: 'https://picsum.photos/id/64/200/200',
@@ -73,6 +76,9 @@ export const mockFeedback: FeedbackItem[] = [
       nameVisibility: 'friends',
       description: '武侠机制本，需要老玩家',
       isHost: true,
+      matchScore: 0,
+      matchReasons: [],
+      timeMatch: 'unknown',
     },
     responses: [
       {
@@ -94,9 +100,9 @@ export const mockFeedback: FeedbackItem[] = [
     ],
   },
   {
-    gameSessionId: 'g3',
+    gameSessionId: 'h3',
     gameSession: {
-      id: 'g3',
+      id: 'h3',
       hostId: 'me',
       hostName: '我',
       hostAvatar: 'https://picsum.photos/id/64/200/200',
@@ -111,6 +117,9 @@ export const mockFeedback: FeedbackItem[] = [
       nameVisibility: 'all',
       description: '轻松欢乐本，适合工作日解压',
       isHost: true,
+      matchScore: 0,
+      matchReasons: [],
+      timeMatch: 'unknown',
     },
     responses: [
       {
